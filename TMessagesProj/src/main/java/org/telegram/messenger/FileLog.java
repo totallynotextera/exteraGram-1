@@ -11,6 +11,8 @@ package org.telegram.messenger;
 import android.util.Log;
 
 import org.telegram.messenger.time.FastDateFormat;
+import org.telegram.messenger.video.MediaCodecVideoConvertor;
+import org.telegram.ui.LaunchActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -211,6 +213,13 @@ public class FileLog {
         }
     }
 
+    private static boolean needSent(Throwable e) {
+        if (e instanceof InterruptedException || e instanceof MediaCodecVideoConvertor.ConversionCanceledException || e instanceof IgnoreSentException) {
+            return false;
+        }
+        return true;
+    }
+
     public static void d(final String message) {
         if (!BuildVars.LOGS_ENABLED) {
             return;
@@ -224,6 +233,9 @@ public class FileLog {
                     getInstance().streamWriter.flush();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    if (AndroidUtilities.isENOSPC(e)) {
+                        LaunchActivity.checkFreeDiscSpaceStatic(1);
+                    }
                 }
             });
         }
@@ -280,5 +292,13 @@ public class FileLog {
                 file.delete();
             }
         }
+    }
+
+    public static class IgnoreSentException extends Exception{
+
+        public IgnoreSentException(String e) {
+            super(e);
+        }
+
     }
 }

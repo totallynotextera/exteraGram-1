@@ -25,6 +25,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.MediaStore;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
@@ -137,9 +138,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.crypto.Cipher;
-
-import com.exteragram.messenger.ExteraConfig;
-import com.exteragram.messenger.extras.Vibrate;
 
 public class PassportActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -1525,7 +1523,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         linearLayout2.addView(passwordAvatarContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 100));
 
         BackupImageView avatarImageView = new BackupImageView(context);
-        avatarImageView.setRoundRadius(ExteraConfig.getAvatarCorners(64));
+        avatarImageView.setRoundRadius(AndroidUtilities.dp(32));
         passwordAvatarContainer.addView(avatarImageView, LayoutHelper.createFrame(64, 64, Gravity.CENTER, 0, 8, 0, 0));
 
         AvatarDrawable avatarDrawable = new AvatarDrawable(botUser);
@@ -2000,7 +1998,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
             linearLayout2.addView(avatarContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 100));
 
             BackupImageView avatarImageView = new BackupImageView(context);
-            avatarImageView.setRoundRadius(ExteraConfig.getAvatarCorners(64));
+            avatarImageView.setRoundRadius(AndroidUtilities.dp(32));
             avatarContainer.addView(avatarImageView, LayoutHelper.createFrame(64, 64, Gravity.CENTER, 0, 8, 0, 0));
 
             AvatarDrawable avatarDrawable = new AvatarDrawable(botUser);
@@ -2231,15 +2229,21 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
 
                 TLRPC.TL_secureValue value = getValueByType(requiredType, true);
                 if (value == null) {
-                    Vibrate.vibrate();
-                    AndroidUtilities.shakeView(getViewByType(requiredType), 2, 0);
+                    Vibrator v = (Vibrator) getParentActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                    if (v != null) {
+                        v.vibrate(200);
+                    }
+                    AndroidUtilities.shakeView(getViewByType(requiredType));
                     return;
                 }
                 String key = getNameForType(requiredType.type);
                 HashMap<String, String> errors = errorsMap.get(key);
                 if (errors != null && !errors.isEmpty()) {
-                    Vibrate.vibrate();
-                    AndroidUtilities.shakeView(getViewByType(requiredType), 2, 0);
+                    Vibrator v = (Vibrator) getParentActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                    if (v != null) {
+                        v.vibrate(200);
+                    }
+                    AndroidUtilities.shakeView(getViewByType(requiredType));
                     return;
                 }
                 valuesToSend.add(new ValueToSend(value, requiredType.selfie_required, requiredType.translation_required));
@@ -3571,8 +3575,11 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         if (field == null) {
             return;
         }
-        Vibrate.vibrate();
-        AndroidUtilities.shakeView(field, 2, 0);
+        Vibrator v = (Vibrator) getParentActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) {
+            v.vibrate(200);
+        }
+        AndroidUtilities.shakeView(field);
         scrollToField(field);
     }
 
@@ -6248,11 +6255,14 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
         if (getParentActivity() == null) {
             return;
         }
-        Vibrate.vibrate();
+        Vibrator v = (Vibrator) getParentActivity().getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) {
+            v.vibrate(200);
+        }
         if (clear) {
             inputFields[FIELD_PASSWORD].setText("");
         }
-        AndroidUtilities.shakeView(inputFields[FIELD_PASSWORD], 2, 0);
+        AndroidUtilities.shakeView(inputFields[FIELD_PASSWORD]);
     }
 
     private void startPhoneVerification(boolean checkPermissions, final String phone, Runnable finishRunnable, ErrorRunnable errorRunnable, final PassportActivityDelegate delegate) {
@@ -7762,7 +7772,7 @@ public class PassportActivity extends BaseFragment implements NotificationCenter
                 code = getCode();
             }
             if (TextUtils.isEmpty(code)) {
-                AndroidUtilities.shakeView(codeFieldContainer, 2, 0);
+                AndroidUtilities.shakeView(codeFieldContainer);
                 return;
             }
             nextPressed = true;

@@ -18,13 +18,11 @@ import android.os.Build;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
-import android.util.Log;
-import android.util.LruCache;
-import android.util.Pair;
 
 import androidx.core.graphics.ColorUtils;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLObject;
@@ -50,6 +48,7 @@ public class AvatarDrawable extends Drawable {
     private float archivedAvatarProgress;
     private boolean smallSize;
     private StringBuilder stringBuilder = new StringBuilder(5);
+    private int roundRadius = -1;
 
     public static final int AVATAR_TYPE_NORMAL = 0;
     public static final int AVATAR_TYPE_SAVED = 1;
@@ -284,7 +283,8 @@ public class AvatarDrawable extends Drawable {
         }
 
         if (stringBuilder.length() > 0) {
-            String text = stringBuilder.toString().toUpperCase();
+            CharSequence text = stringBuilder.toString().toUpperCase();
+            text = Emoji.replaceEmoji(text, namePaint.getFontMetricsInt(), AndroidUtilities.dp(16), true);
             try {
                 textLayout = new StaticLayout(text, namePaint, AndroidUtilities.dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                 if (textLayout.getLineCount() > 0) {
@@ -438,5 +438,9 @@ public class AvatarDrawable extends Drawable {
     private int getThemedColor(String key) {
         Integer color = resourcesProvider != null ? resourcesProvider.getColor(key) : null;
         return color != null ? color : Theme.getColor(key);
+    }
+
+    public void setRoundRadius(int roundRadius) {
+        this.roundRadius = roundRadius;
     }
 }

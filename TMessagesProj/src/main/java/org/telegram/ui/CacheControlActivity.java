@@ -116,6 +116,8 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
 
     long fragmentCreateTime;
 
+    private boolean updateDatabaseSize;
+
     @Override
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
@@ -549,7 +551,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
                             CheckBoxCell cell = (CheckBoxCell) v;
                             int num = (Integer) cell.getTag();
                             if (enabledCount == 1 && clearViewData[num].clear) {
-                                AndroidUtilities.shakeView(((CheckBoxCell) v).getCheckBoxView(), 2, 0);
+                                AndroidUtilities.shakeView(((CheckBoxCell) v).getCheckBoxView());
                                 return;
                             }
 
@@ -665,6 +667,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
             progressDialog = null;
             if (listAdapter != null) {
                 databaseSize = MessagesStorage.getInstance(currentAccount).getDatabaseSize();
+                updateDatabaseSize = true;
                 listAdapter.notifyDataSetChanged();
             }
         }
